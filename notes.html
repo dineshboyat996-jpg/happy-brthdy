@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💌 My Notes for You</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+    }
+    
+    /* Video background with overlay */
+    .video-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      overflow: hidden;
+    }
+    
+    .video-background video {
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+    }
+    
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 215, 225, 0.7); /* Soft pink overlay */
+      backdrop-filter: blur(5px); /* Blur effect */
+      z-index: -1;
+    }
+    
+    /* Content styling */
+    .content {
+      text-align: center;
+      z-index: 1;
+      padding: 20px;
+      max-width: 90%;
+    }
+    
+    h2 {
+      color: #ff4b68;
+      margin-bottom: 25px;
+      font-size: 28px;
+      text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.7);
+    }
+    
+    .note-container {
+      width: 320px;
+      height: 420px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.6s ease;
+      padding: 20px;
+    }
+    
+    .note-container:hover {
+      transform: scale(1.02);
+    }
+    
+    .note-content {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      padding: 10px;
+      color: #333;
+      font-size: 16px;
+      line-height: 1.6;
+      text-align: left;
+    }
+    
+    .note-content::-webkit-scrollbar {
+      width: 5px;
+    }
+    
+    .note-content::-webkit-scrollbar-thumb {
+      background: #ff758c;
+      border-radius: 10px;
+    }
+    
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .btn-row {
+      display: flex;
+      gap: 15px;
+    }
+    
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 25px;
+      background: #ff758c;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    
+    button:hover {
+      background: #ff4b68;
+      transform: scale(1.05);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 480px) {
+      .note-container {
+        width: 90%;
+        height: 350px;
+      }
+      
+      h2 {
+        font-size: 22px;
+      }
+      
+      .btn-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Video background -->
+  <div class="video-background">
+    <video autoplay muted loop>
+      <source src="bdy.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+  <div class="overlay"></div>
+  
+  <!-- Content -->
+  <div class="content">
+    <h2>💌 My Thoughts for You 💕</h2>
+    <div class="note-container">
+      <div class="note-content" id="noteText">
+        <!-- Your text will appear here -->
+        Click "Next" to read my thoughts for you...
+      </div>
+    </div>
+    
+    <div class="controls">
+      <div class="btn-row">
+        <button onclick="prevNote()">⬅️ Back</button>
+        <button onclick="nextNote()">Next ➡️</button>
+      </div>
+      <button onclick="goToF1()">🏎️ Go to F1 Page</button>
+    </div>
+  </div>
+
+  <script>
+    // Array of notes (text instead of images)
+    const notes = [
+      "My dearest, every moment with you feels like a beautiful dream I never want to wake up from. Your smile brightens my darkest days...",
+      "Remember that time we stayed up all night talking? I knew then that I had found someone truly special. Your mind fascinates me as much as your heart captivates me.",
+      "I appreciate how you always know exactly what to say to make me feel better. Your empathy and kindness inspire me to be a better person every day.",
+      "No matter what challenges life brings us, I know we can face them together. You make me believe that anything is possible when you have the right person by your side."
+    ];
+
+    let currentIndex = 0;
+    const noteText = document.getElementById("noteText");
+
+    function showNote(index) {
+      if(index >= 0 && index < notes.length) {
+        noteText.innerHTML = notes[index];
+      }
+    }
+
+    function nextNote() {
+      if(currentIndex < notes.length - 1) {
+        currentIndex++;
+        showNote(currentIndex);
+      } else {
+        // Loop back to the first note
+        currentIndex = 0;
+        showNote(currentIndex);
+      }
+    }
+
+    function prevNote() {
+      if(currentIndex > 0) {
+        currentIndex--;
+        showNote(currentIndex);
+      } else {
+        // Loop to the last note
+        currentIndex = notes.length - 1;
+        showNote(currentIndex);
+      }
+    }
+
+    // Function to go to F1 page
+    function goToF1() {
+      window.location.href = "f1.html"; // make sure f1.html exists
+    }
+
+    // Initialize with first note
+    showNote(currentIndex);
+  </script>
+</body>
+</html>

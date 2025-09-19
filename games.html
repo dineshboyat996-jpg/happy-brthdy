@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🎡 Spin the Wheel of Love</title>
+  <link rel="stylesheet" href="css/style.css"> <!-- optional global styles -->
+  <style>
+    :root{
+      --bg1:#fff0f6;
+      --bg2:#ffe6e6;
+      --accent:#ff4b6e;
+      --accent-dark:#ff1e4a;
+      --card:#ffffff;
+      --glass: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;
+      display:flex;align-items:center;justify-content:center;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#333;
+      padding:24px;
+    }
+
+    .wrap{
+      width:100%;max-width:980px;
+      display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:center;
+    }
+
+    /* Left: wheel card */
+    .card{
+      background:var(--card);
+      border-radius:16px;
+      padding:22px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.08);
+      text-align:center;
+    }
+    h1{margin:0 0 8px;font-size:1.6rem}
+    p.lead{color:#666;margin:0 0 14px}
+
+    .wheel-wrap{position:relative;display:flex;align-items:center;justify-content:center;margin:10px 0 6px}
+    canvas#wheel{
+      width:100%;
+      max-width:520px;
+      height:auto;
+      border-radius:50%;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      background: conic-gradient(from 180deg at 50% 50%, #fff, #fff);
+    }
+    /* pointer */
+    .pointer{
+      position:absolute; top:6px; width:0;height:0;
+      border-left:16px solid transparent;
+      border-right:16px solid transparent;
+      border-bottom:28px solid var(--accent);
+      filter:drop-shadow(0 4px 10px rgba(0,0,0,0.12));
+      transform:translateY(-8px);
+      z-index:10;
+      border-bottom-left-radius:4px;border-bottom-right-radius:4px;
+    }
+
+    .controls{display:flex;gap:12px;justify-content:center;margin-top:14px}
+    button#spinBtn{
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
+      color:white;border:none;padding:12px 20px;border-radius:999px;font-weight:700;
+      cursor:pointer;font-size:1rem;box-shadow:0 10px 30px rgba(255,75,110,0.18);
+      transition:transform .15s;
+    }
+    button#spinBtn:active{transform:scale(.98)}
+    button#backBtn{
+      background:transparent;border:2px solid var(--accent);color:var(--accent);padding:10px 16px;border-radius:999px;font-weight:700;cursor:pointer;
+    }
+
+    .side {
+      background:linear-gradient(180deg,var(--glass), #fff);
+      padding:18px;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,0.06);
+      text-align:left;
+    }
+    .side h3{margin:0 0 10px}
+    .prize-list{display:flex;flex-direction:column;gap:8px}
+    .prize {background:#fff;border-radius:10px;padding:10px 12px;box-shadow:0 6px 18px rgba(0,0,0,0.04);font-weight:600}
+    .hint{font-size:13px;color:#666;margin-top:12px}
+
+    /* modal */
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:200;opacity:0;pointer-events:none;transition:opacity .18s}
+    .modal.show{opacity:1;pointer-events:all}
+    .modal .box{background:white;padding:20px;border-radius:12px;max-width:420px;width:92%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18)}
+    .modal h2{margin:0 0 8px}
+    .modal p{margin:0 0 14px}
+    .closeBtn{background:var(--accent);color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700}
+
+    footer{grid-column:1/-1;text-align:center;color:#777;margin-top:12px;font-size:13px}
+    @media (max-width:900px){
+      .wrap{grid-template-columns:1fr; padding-bottom:26px}
+      .side{order:2}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>🎡 Spin the Wheel of Love</h1>
+      <p class="lead">Spin to get a cute or flirty surprise — every slice is made for you, Pookie 🐻</p>
+
+      <div class="wheel-wrap">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" width="800" height="800"></canvas>
+      </div>
+
+      <div class="controls">
+        <button id="spinBtn">Spin Me 💕</button>
+        <button id="backBtn" onclick="location.href='index.html'">Back Home ←</button>
+      </div>
+      <div style="margin-top:12px;color:#666;font-size:13px">Tip: Click spin once and watch it land — surprises are waiting ✨</div>
+    </div>
+
+    <aside class="side">
+      <h3>Possible Rewards</h3>
+      <div class="prize-list" id="prizeList">
+        <!-- Items filled by JS -->
+      </div>
+      <div class="hint">You can edit the prize list in the file to personalize messages (or add more!).</div>
+    </aside>
+
+    <footer>Made with love — from Dinesh 💝</footer>
+  </div>
+
+  <!-- modal result -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="box">
+      <h2 id="modalTitle">You got…</h2>
+      <p id="modalText">Prize text</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:14px">
+        <button class="closeBtn" id="closeModal">Thanks ❤️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- confetti canvas (absolute overlay via JS) -->
+  <canvas id="confettiCanvas" style="position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;z-index:150;"></canvas>
+
+  <script>
+  /************* CONFIG: customize these prizes *************/
+  const PRIZES = [
+    "I will write you a poem ✍️",
+    "i want virtual kiss incoming 💋",
+    "Send your cutest selfie 📸",
+    "I will call you Pookie 10 times today 😘",
+    "One special audio message from me 🎙️",
+    "we have to plan our real life date 💞",
+    "A million hugs 🤗🤗🤗",
+    "Say 'I love you' in Nepali: माया (Maya) 🥺"
+  ];
+  /**********************************************************/
+
+  // Fill prize list UI
+  const prizeListEl = document.getElementById('prizeList');
+  PRIZES.forEach((p)=> {
+    const d = document.createElement('div');
+    d.className='prize'; d.textContent = p;
+    prizeListEl.appendChild(d);
+  });
+
+  // Canvas wheel drawing
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  const size = Math.min(canvas.width, canvas.height);
+  const cx = canvas.width/2, cy = canvas.height/2, radius = size/2 - 10;
+  const segments = PRIZES.length;
+  const colors = ['#FFCDD2','#F8BBD0','#E1BEE7','#D1C4E9','#C5CAE9','#BBDEFB','#B3E5FC','#B2DFDB','#C8E6C9','#DCEDC8'];
+
+  function drawWheel(rotation=0){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(rotation);
+    const segAngle = 2*Math.PI/segments;
+    for(let i=0;i<segments;i++){
+      const start = i*segAngle;
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.arc(0,0,radius,start,start+segAngle);
+      ctx.closePath();
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fill();
+      // text
+      ctx.save();
+      ctx.rotate(start + segAngle/2);
+      ctx.translate(radius*0.62,0);
+      ctx.rotate(Math.PI/2);
+      ctx.fillStyle = '#222';
+      ctx.font = 'bold 22px Poppins, sans-serif';
+      ctx.textAlign = 'center';
+      // wrap text if long
+      const text = PRIZES[i];
+      wrapText(ctx, text, 0, -10, 140, 18);
+      ctx.restore();
+    }
+    // center circle
+    ctx.beginPath(); ctx.arc(0,0,70,0,Math.PI*2); ctx.fillStyle='white'; ctx.fill();
+    ctx.restore();
+    // ring
+    ctx.beginPath(); ctx.arc(cx,cy,radius+6,0,Math.PI*2); ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=10; ctx.stroke();
+  }
+
+  function wrapText(context, text, x, y, maxWidth, lineHeight){
+    const words = text.split(' ');
+    let line = '';
+    let dy = 0;
+    for(let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + ' ';
+      const metrics = context.measureText(testLine);
+      if (metrics.width > maxWidth && n > 0) {
+        context.fillText(line, x, y + dy);
+        line = words[n] + ' ';
+        dy += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    context.fillText(line, x, y + dy);
+  }
+
+  // initial draw
+  drawWheel(0);
+
+  // spin logic
+  let isSpinning = false;
+  const spinBtn = document.getElementById('spinBtn');
+  const modal = document.getElementById('modal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalText = document.getElementById('modalText');
+  const closeModalBtn = document.getElementById('closeModal');
+
+  spinBtn.addEventListener('click', ()=> {
+    if(isSpinning) return;
+    isSpinning = true;
+    spinBtn.disabled = true;
+    spinBtn.textContent = "Spinning... 💫";
+
+    // choose random result index but with smooth feel:
+    // compute random rotations (many spins) + target segment
+    const extraSpins = Math.floor(Math.random()*4) + 4; // 4-7 full spins
+    const targetIndex = Math.floor(Math.random()*segments);
+    // compute target angle so that pointer (top) lands on targetIndex
+    const segAngle = 360 / segments;
+    const randomOffset = (Math.random()* (segAngle - 6) - (segAngle/2 - 3)); // tiny offset for variability
+    // pointer is at top (0 degrees pointing up), our wheel drawing 0 rotation has segment0 at angle 0 -> adjust:
+    // We want rotationDegrees so that segment's center angle aligns with -90deg (top)
+    const targetDeg = -(targetIndex * segAngle + segAngle/2) + randomOffset;
+    const finalDeg = extraSpins*360 + targetDeg;
+
+    animateSpin(finalDeg, 4000).then(()=> {
+      showResult(targetIndex);
+      isSpinning = false;
+      spinBtn.disabled = false;
+      spinBtn.textContent = "Spin Me 💕";
+    });
+  });
+
+  // animate spin with easing
+  function animateSpin(deg, duration){
+    return new Promise((resolve)=>{
+      const start = performance.now();
+      const startRot = currentRotationDeg || 0;
+      const endRot = startRot + deg;
+      function tick(now){
+        const t = Math.min(1, (now - start)/duration);
+        const eased = easeOutCubic(t);
+        const cur = startRot + (endRot - startRot)*eased;
+        currentRotationDeg = cur;
+        drawWheel((cur * Math.PI)/180);
+        if(t < 1) requestAnimationFrame(tick);
+        else resolve();
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+  let currentRotationDeg = 0;
+
+  function showResult(index){
+    const prize = PRIZES[index];
+    modalTitle.textContent = "You got…";
+    modalText.textContent = prize;
+    modal.classList.add('show');
+    burstConfetti(); // celebrate
+  }
+
+  closeModalBtn.addEventListener('click', ()=> {
+    modal.classList.remove('show');
+  });
+
+  // ---------------- Confetti ----------------
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+  const confCtx = confettiCanvas.getContext('2d');
+  let confettiPieces = [];
+
+  function ConfettiPiece(){
+    this.x = Math.random()*confettiCanvas.width;
+    this.y = Math.random()*-confettiCanvas.height;
+    this.w = 8 + Math.random()*10;
+    this.h = 8 + Math.random()*6;
+    this.vx = -2 + Math.random()*4;
+    this.vy = 2 + Math.random()*4;
+    this.angle = Math.random()*360;
+    this.spin = -0.2 + Math.random()*0.4;
+    this.color = colors[Math.floor(Math.random()*colors.length)];
+  }
+
+  function burstConfetti(){
+    confettiPieces = [];
+    for(let i=0;i<120;i++) confettiPieces.push(new ConfettiPiece());
+    const start = performance.now();
+    function frame(now){
+      confCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+      confettiPieces.forEach((p)=>{
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.02; // gravity
+        p.angle += p.spin;
+        confCtx.save();
+        confCtx.translate(p.x,p.y);
+        confCtx.rotate(p.angle);
+        confCtx.fillStyle = p.color;
+        confCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+        confCtx.restore();
+      });
+      // remove pieces that fall below screen to avoid long running
+      confettiPieces = confettiPieces.filter(p => p.y < confettiCanvas.height + 100);
+      if(confettiPieces.length>0) requestAnimationFrame(frame);
+      else confCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // handle resize
+  window.addEventListener('resize', ()=> {
+    confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight;
+    // redraw wheel with current rotation
+    drawWheel((currentRotationDeg||0)*Math.PI/180);
+  });
+
+  </script>
+</body>
+</html>

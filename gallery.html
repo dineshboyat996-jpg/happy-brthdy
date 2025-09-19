@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📸 Our Beautiful Memories</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      overflow-x: hidden;
+    }
+    
+    /* Video background with soft overlay */
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      overflow: hidden;
+    }
+    
+    .video-background video {
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 221, 225, 0.85);
+      z-index: -1;
+    }
+    
+    /* Content styling */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+      opacity: 0;
+      animation: fadeIn 1.5s ease forwards;
+    }
+    
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      color: #d44d6a;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    
+    .subtitle {
+      font-size: 1.3rem;
+      color: #7a4b5e;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    /* Gallery styling */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 40px;
+    }
+    
+    .gallery-item {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transition: all 0.4s ease;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    
+    .gallery-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .gallery-item:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+    
+    .gallery img, .gallery video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      aspect-ratio: 3/4;
+      transition: transform 0.5s ease;
+    }
+    
+    .gallery-item:hover img, 
+    .gallery-item:hover video {
+      transform: scale(1.05);
+    }
+    
+    .caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      color: white;
+      padding: 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+    
+    .gallery-item:hover .caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .caption h3 {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    .caption p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    /* Heart animation */
+    .heart {
+      position: absolute;
+      font-size: 20px;
+      opacity: 0;
+      animation: floatHearts 6s linear infinite;
+    }
+    
+    @keyframes floatHearts {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* Navigation button */
+    .next-btn {
+      display: block;
+      width: fit-content;
+      margin: 60px auto 30px;
+      padding: 15px 40px;
+      background: #d44d6a;
+      color: white;
+      text-decoration: none;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(212, 77, 106, 0.3);
+    }
+    
+    .next-btn:hover {
+      background: #b83b5e;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(212, 77, 106, 0.4);
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+      
+      .subtitle {
+        font-size: 1.1rem;
+      }
+      
+      .gallery {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Video background with soft romantic theme -->
+  <div class="video-background">
+    <video autoplay muted loop>
+      <source src="Comp 1.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+  <div class="overlay"></div>
+  
+  <!-- Hearts animation -->
+  <div id="hearts-container"></div>
+  
+  <div class="container">
+    <header>
+      <h1>📸 Your Beautiful Memories 🎞️</h1>
+      <p class="subtitle">Every picture & video here is a piece of my heart... A reminder that our love is forever ❤️</p>
+    </header>
+    
+    <div class="gallery">
+      <!-- Replace with your actual images and videos -->
+      <div class="gallery-item">
+        <img src="2.jpg" alt="Your beautiful smile">
+        <div class="caption">
+          <h3>That Smile</h3>
+          <p>The one that melts my heart every time</p>
+        </div>
+      </div>
+      
+      <div class="gallery-item">
+        <img src="1.jpg" alt="Special moment">
+        <div class="caption">
+          <h3>Perfect Moment</h3>
+          <p>Time frezze</p>
+        </div>
+      </div>
+      
+      <div class="gallery-item">
+        <img src="3.jpg">
+        <div class="caption">
+          <h3></h3>
+          <p></p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="12.jpg">
+        <div class="caption">
+          <h3></h3>
+          <p></p>
+        </div>
+      </div>
+      
+      <div class="gallery-item">
+        <video controls>
+          <source src="10.mp4" type="video/mp4">
+          Your browser does not support video playback.
+        </video>
+        <div class="caption">
+          <h3>Precious Moments</h3>
+          <p>Every second with you is a treasure</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <video controls>
+          <source src="9.mp4" type="video/mp4">
+          Your browser does not support video playback.
+        </video>
+        <div class="caption">
+          <h3>Precious Moments</h3>
+          <p></p>
+        </div>
+      </div>
+      
+      <div class="gallery-item">
+        <img src="7.jpg">
+        <div class="caption">
+          <h3>Pure Joy</h3>
+          <p>Your laughter is my favorite sound</p>
+        </div>
+      </div>
+      
+      <div class="gallery-item">
+        <video controls>
+          <source src="8.mp4" type="video/mp4">
+          Your browser does not support video playback.
+        </video>
+        <div class="caption">
+          <h3></h3>
+          <p></p>
+        </div>
+      </div>
+    </div>
+    
+    <a href="games.html" class="next-btn">Next Surprise → 🎮</a>
+  </div>
+
+  <script>
+    // Create floating hearts
+    function createHearts() {
+      const heartsContainer = document.getElementById('hearts-container');
+      const heartSymbols = ['❤️', '💖', '💕', '💗', '💓', '💞'];
+      
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.innerHTML = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDelay = Math.random() * 5 + 's';
+        heart.style.fontSize = (15 + Math.random() * 15) + 'px';
+        heartsContainer.appendChild(heart);
+      }
+    }
+    
+    // Scroll animation for gallery items
+    function checkScroll() {
+      const galleryItems = document.querySelectorAll('.gallery-item');
+      
+      galleryItems.forEach((item, index) => {
+        const itemTop = item.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (itemTop < windowHeight * 0.85) {
+          // Stagger the animation with a delay based on index
+          setTimeout(() => {
+            item.classList.add('visible');
+          }, index * 100);
+        }
+      });
+    }
+    
+    // Initialize
+    window.addEventListener('load', function() {
+      createHearts();
+      checkScroll();
+    });
+    
+    window.addEventListener('scroll', checkScroll);
+  </script>
+</body>
+</html>
