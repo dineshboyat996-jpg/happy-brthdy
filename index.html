@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Happy Birthday Vanshika ❤️</title>
-  <link rel="stylesheet" href="css/style.css">
   <style>
     /* Reset */
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -92,11 +91,56 @@
       box-shadow: 0 0 25px rgba(255, 20, 147, 0.9);
     }
 
+    /* Question screens */
+    .question-screen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .question-container {
+      background: linear-gradient(120deg, rgba(255, 105, 180, 0.9), rgba(138, 43, 226, 0.9));
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 90%;
+      width: 500px;
+      box-shadow: 0 0 30px rgba(255, 20, 147, 0.8);
+    }
+    
+    .question-video {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 15px;
+      margin: 15px 0;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    }
+    
+    .question-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    
+    .question-button {
+      padding: 10px 20px;
+      min-width: 100px;
+    }
+
     /* Mobile-friendly text */
     @media (max-width: 768px) {
       h1 { font-size: 1.6rem; }
       p { font-size: 1rem; }
       button { font-size: 0.9rem; padding: 10px 18px; }
+      .question-container { padding: 20px; }
+      .question-buttons { flex-direction: column; }
     }
   </style>
 </head>
@@ -116,9 +160,186 @@
   <div class="container">
     <h1>🎂 Happy Birthday Vanshika ❤️</h1>
     <p>My love, my pookie, my everything 💕</p>
-    <button onclick="location.href='notes.html'">Open Your Surprise 🎁</button>
+    <button id="surprise-btn">Open Your Surprise 🎁</button>
   </div>
 
-  <script src="js/main.js"></script>
+  <!-- Question Screens -->
+  <div class="question-screen" id="welcome-screen">
+    <div class="question-container">
+      <h2>I have something special for you, my cutie! 💖</h2>
+      <video class="question-video" autoplay muted loop playsinline>
+        <source src="c1.mp4" type="video/mp4">
+      </video>
+      <button class="question-button" onclick="showQuestion('alone-screen')">Next ❤️</button>
+    </div>
+  </div>
+
+  <div class="question-screen" id="alone-screen">
+    <div class="question-container">
+      <h2>First question... are you alone right now? 🤔</h2>
+      <video class="question-video" autoplay muted loop playsinline>
+        <source src="c2.mp4" type="video/mp4">
+      </video>
+      <div class="question-buttons">
+        <button class="question-button" onclick="showQuestion('closer-screen')">Yes 😊</button>
+        <button class="question-button" onclick="showQuestion('waiting-screen')">No, someone's here</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="question-screen" id="waiting-screen">
+    <div class="question-container">
+      <h2>Okay, I'll wait until you're alone... my message is just for you 💕</h2>
+      <video class="question-video" autoplay muted loop playsinline>
+        <source src="c3.mp4" type="video/mp4">
+      </video>
+      <button class="question-button" onclick="showQuestion('alone-screen')">I'm alone now!</button>
+    </div>
+  </div>
+
+  <div class="question-screen" id="closer-screen">
+    <div class="question-container">
+      <h2>Perfect! Now... come a little closer to the screen 😘</h2>
+      <video class="question-video" autoplay muted loop playsinline>
+        <source src="c4.mp4" type="video/mp4">
+      </video>
+      <button class="question-button" onclick="showQuestion('even-closer-screen')">I'm closer now</button>
+    </div>
+  </div>
+
+  <div class="question-screen" id="even-closer-screen">
+    <div class="question-container">
+      <h2>Even closer, my love... I want to whisper something to you 💋</h2>
+      <video class="question-video" autoplay muted loop playsinline>
+        <source src="c5.mp4" type="video/mp4">
+      </video>
+      <button class="question-button" onclick="showQuestion('kiss-screen')">Okay, I'm super close!</button>
+    </div>
+  </div>
+
+  <div class="question-screen" id="kiss-screen">
+    <div class="question-container">
+      <h2>This is from me to you... a virtual kiss! Mwah! 💋😘</h2>
+      <video class="question-video" autoplay muted loop playsinline>
+        <source src="c6.mp4" type="video/mp4">
+      </video>
+      <button class="question-button" onclick="redirectToNotes()">Continue to My Thoughts 💌</button>
+    </div>
+  </div>
+
+  <script>
+    // Confetti effect
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    let confetti = [];
+    const confettiCount = 100;
+    const gravity = 0.5;
+    const terminalVelocity = 5;
+    const drag = 0.075;
+    const colors = [
+      { front: '#ff71ce', back: '#d8006c' }, // Pink
+      { front: '#01cdfe', back: '#0081b8' }, // Blue
+      { front: '#05ffa1', back: '#00b86c' }, // Green
+      { front: '#b967ff', back: '#7c32c9' }, // Purple
+      { front: '#fffb96', back: '#d8d400' }  // Yellow
+    ];
+
+    // Initialize confetti
+    for (let i = 0; i < confettiCount; i++) {
+      confetti.push({
+        color: colors[Math.floor(Math.random() * colors.length)],
+        dimensions: {
+          x: Math.random() * 10 + 5,
+          y: Math.random() * 10 + 5
+        },
+        position: {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height
+        },
+        rotation: Math.random() * 2 * Math.PI,
+        scale: {
+          x: 1,
+          y: 1
+        },
+        velocity: {
+          x: Math.random() * 20 - 10,
+          y: Math.random() * 20 - 15
+        }
+      });
+    }
+
+    // Confetti animation
+    function updateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      confetti.forEach((confetto, index) => {
+        let width = confetto.dimensions.x * confetto.scale.x;
+        let height = confetto.dimensions.y * confetto.scale.y;
+        
+        // Apply forces to velocity
+        confetto.velocity.x -= confetto.velocity.x * drag;
+        confetto.velocity.y = Math.min(confetto.velocity.y + gravity, terminalVelocity);
+        confetto.velocity.y -= confetto.velocity.y * drag;
+        
+        // Update position
+        confetto.position.x += confetto.velocity.x;
+        confetto.position.y += confetto.velocity.y;
+        
+        // Loop confetto when it goes off screen
+        if (confetto.position.y > canvas.height) {
+          confetto.position.x = Math.random() * canvas.width;
+          confetto.position.y = -10;
+        }
+        
+        // Spin confetto
+        confetto.rotation += confetto.velocity.x / 50;
+        
+        ctx.save();
+        ctx.translate(confetto.position.x, confetto.position.y);
+        ctx.rotate(confetto.rotation);
+        
+        // Draw confetto
+        ctx.fillStyle = confetto.color.front;
+        ctx.fillRect(-width / 2, -height / 2, width, height);
+        
+        ctx.restore();
+      });
+      
+      requestAnimationFrame(updateConfetti);
+    }
+
+    // Start confetti animation
+    updateConfetti();
+
+    // Question navigation
+    function showQuestion(questionId) {
+      // Hide all questions
+      document.querySelectorAll('.question-screen').forEach(screen => {
+        screen.style.display = 'none';
+      });
+      
+      // Show the requested question
+      document.getElementById(questionId).style.display = 'flex';
+    }
+    
+    function redirectToNotes() {
+      // Redirect to notes.html
+      window.location.href = 'notes.html';
+    }
+
+    // Add event listener to the surprise button
+    document.getElementById('surprise-btn').addEventListener('click', function() {
+      showQuestion('welcome-screen');
+    });
+
+    // Resize confetti canvas when window size changes
+    window.addEventListener('resize', function() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
 </body>
 </html>
