@@ -133,6 +133,32 @@
       transform: scale(1.05);
     }
     
+    /* Heart animation */
+    .heart {
+      position: absolute;
+      font-size: 20px;
+      opacity: 0;
+      animation: floatHearts 5s ease-in infinite;
+      z-index: 10;
+    }
+    
+    @keyframes floatHearts {
+      0% {
+        opacity: 0;
+        transform: translateY(0) rotate(0deg);
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) rotate(360deg);
+      }
+    }
+    
     /* Responsive design */
     @media (max-width: 480px) {
       .note-container {
@@ -161,13 +187,15 @@
   </div>
   <div class="overlay"></div>
   
+  <!-- Floating hearts -->
+  <div id="hearts-container"></div>
+  
   <!-- Content -->
   <div class="content">
     <h2>💌 My Thoughts for You 💕</h2>
     <div class="note-container">
       <div class="note-content" id="noteText">
-        <!-- Your text will appear here -->
-        Click "Next" to read my thoughts for you...
+        <!-- Initial content will be set by JavaScript -->
       </div>
     </div>
     
@@ -181,11 +209,22 @@
   </div>
 
   <script>
-    // Array of notes (text instead of images)
+    // Array of notes with your special message as the first note
     const notes = [
+      `<p>My dearest Vanshu🥺🎀,</p>
+      <p>From the moment you came into my life, everything changed. Your smile brightens my darkest days, your laughter is my favorite melody, and your love is the greatest gift I've ever received.</p>
+      <p>On your special day, I want you to know how incredibly special you are to me. You're not just my girlfriend - you're my best friend, my confidante, and my greatest blessing.</p>
+      <p>I cherish every moment we spend together, from our deep conversations to our comfortable silences. You make me a better person, and I'm endlessly grateful for your presence in my life.</p>
+      <p>Happy birthday to the most amazing woman I know. May your day be as beautiful as you are, filled with joy, laughter, and all the things that make you smile.</p>
+      <p>Forever yours,</p>
+      <p>Your loving dinuu🥺🎀 ❤️</p>`,
+      
       "My dearest, every moment with you feels like a beautiful dream I never want to wake up from. Your smile brightens my darkest days...",
+      
       "Remember that time we stayed up all night talking? I knew then that I had found someone truly special. Your mind fascinates me as much as your heart captivates me.",
+      
       "I appreciate how you always know exactly what to say to make me feel better. Your empathy and kindness inspire me to be a better person every day.",
+      
       "No matter what challenges life brings us, I know we can face them together. You make me believe that anything is possible when you have the right person by your side."
     ];
 
@@ -225,8 +264,24 @@
       window.location.href = "f1.html"; // make sure f1.html exists
     }
 
-    // Initialize with first note
+    // Function to create floating hearts
+    function createHearts() {
+      const heartsContainer = document.getElementById('hearts-container');
+      const heartEmojis = ['❤️', '💕', '💖', '💗', '💓', '💘'];
+      
+      for (let i = 0; i < 15; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.innerHTML = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDelay = Math.random() * 5 + 's';
+        heartsContainer.appendChild(heart);
+      }
+    }
+
+    // Initialize with first note and create hearts
     showNote(currentIndex);
+    createHearts();
   </script>
 </body>
 </html>
