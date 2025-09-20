@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>🎡 Spin the Wheel of Love</title>
-  <link rel="stylesheet" href="css/style.css"> <!-- optional global styles -->
   <style>
     :root{
       --bg1:#fff0f6;
@@ -86,10 +85,36 @@
     /* modal */
     .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:200;opacity:0;pointer-events:none;transition:opacity .18s}
     .modal.show{opacity:1;pointer-events:all}
-    .modal .box{background:white;padding:20px;border-radius:12px;max-width:420px;width:92%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18)}
+    .modal .box{background:white;padding:20px;border-radius:12px;max-width:520px;width:92%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18)}
     .modal h2{margin:0 0 8px}
     .modal p{margin:0 0 14px}
     .closeBtn{background:var(--accent);color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700}
+    
+    /* Image container */
+    .image-container {
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+      background: #f9f9f9;
+    }
+    .image-container img {
+      max-width: 100%;
+      max-height: 250px;
+      display: block;
+    }
+    .image-placeholder {
+      color: #ccc;
+      font-style: italic;
+      text-align: center;
+      padding: 20px;
+    }
 
     footer{grid-column:1/-1;text-align:center;color:#777;margin-top:12px;font-size:13px}
     @media (max-width:900px){
@@ -132,6 +157,13 @@
     <div class="box">
       <h2 id="modalTitle">You got…</h2>
       <p id="modalText">Prize text</p>
+      
+      <!-- Image container for reward pictures -->
+      <div id="imageContainer" class="image-container">
+        <div class="image-placeholder">Image will appear here</div>
+        <img id="rewardImage" src="" alt="Reward image" style="display:none;">
+      </div>
+      
       <div style="display:flex;gap:10px;justify-content:center;margin-top:14px">
         <button class="closeBtn" id="closeModal">Thanks ❤️</button>
       </div>
@@ -144,14 +176,13 @@
   <script>
   /************* CONFIG: customize these prizes *************/
   const PRIZES = [
-    "I will write you a poem ✍️",
-    "i want virtual kiss incoming 💋",
-    "Send your cutest selfie 📸",
-    "I will call you Pookie 10 times today 😘",
-    "One special audio message from me 🎙️",
-    "we have to plan our real life date 💞",
-    "A million hugs 🤗🤗🤗",
-    "Say 'I love you' in Nepali: माया (Maya) 🥺"
+    { text: "💋 Voice note kissy shower (sends 5+ kissy voice notes with mwahhh sounds)", image: "kiss.jpg" },
+    { text: "🐻 Virtual cuddle (sends your a pic/video hugging a pillow, saying 'this is me')", image: "cddle.jpg" },
+    { text: "🧸 Photo treat (sends a cute selfie holding a teddy or pouting for me)", image: "eat.jpg" },
+    { text: "💋 Double kisses (two extra voice kisses if wheel lands here)", image: "kiss.jpg" },
+    { text: "❤️ Wildcard (choose any reward herself to spoil me)", image: "aaaa.jpg" },
+    { text: "😘 One special nickname (she makes a new cutu nickname for me)", image: "smile.jpg" },
+    { text: "say love you 30 times😤😤😤😤😤", image: "angry.jpg" }
   ];
   /**********************************************************/
 
@@ -159,7 +190,8 @@
   const prizeListEl = document.getElementById('prizeList');
   PRIZES.forEach((p)=> {
     const d = document.createElement('div');
-    d.className='prize'; d.textContent = p;
+    d.className='prize'; 
+    d.textContent = p.text;
     prizeListEl.appendChild(d);
   });
 
@@ -191,10 +223,10 @@
       ctx.translate(radius*0.62,0);
       ctx.rotate(Math.PI/2);
       ctx.fillStyle = '#222';
-      ctx.font = 'bold 22px Poppins, sans-serif';
+      ctx.font = 'bold 18px Poppins, sans-serif';
       ctx.textAlign = 'center';
       // wrap text if long
-      const text = PRIZES[i];
+      const text = PRIZES[i].text;
       wrapText(ctx, text, 0, -10, 140, 18);
       ctx.restore();
     }
@@ -233,6 +265,9 @@
   const modalTitle = document.getElementById('modalTitle');
   const modalText = document.getElementById('modalText');
   const closeModalBtn = document.getElementById('closeModal');
+  const imageContainer = document.getElementById('imageContainer');
+  const rewardImage = document.getElementById('rewardImage');
+  const imagePlaceholder = document.querySelector('.image-placeholder');
 
   spinBtn.addEventListener('click', ()=> {
     if(isSpinning) return;
@@ -286,7 +321,27 @@
   function showResult(index){
     const prize = PRIZES[index];
     modalTitle.textContent = "You got…";
-    modalText.textContent = prize;
+    modalText.textContent = prize.text;
+    
+    // Show image if available for this prize
+    if (prize.image) {
+      rewardImage.src = prize.image;
+      rewardImage.alt = prize.text;
+      rewardImage.onload = function() {
+        imagePlaceholder.style.display = 'none';
+        rewardImage.style.display = 'block';
+      };
+      rewardImage.onerror = function() {
+        imagePlaceholder.textContent = "Image not found: " + prize.image;
+        imagePlaceholder.style.display = 'block';
+        rewardImage.style.display = 'none';
+      };
+    } else {
+      imagePlaceholder.textContent = "No image for this reward";
+      imagePlaceholder.style.display = 'block';
+      rewardImage.style.display = 'none';
+    }
+    
     modal.classList.add('show');
     burstConfetti(); // celebrate
   }
